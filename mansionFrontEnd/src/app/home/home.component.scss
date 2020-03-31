@@ -1,0 +1,13 @@
+.startFlex{
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.btnAround{
+  width: 50vw;
+  display: flex;
+  justify-content: space-around;
+}
