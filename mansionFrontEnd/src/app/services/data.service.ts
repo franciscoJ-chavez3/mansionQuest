@@ -3,28 +3,37 @@ import { HttpClient } from '@angular/common/http';
 import { IRoomBackground } from '../interfaces/i-room-background';
 import { IRoom } from '../interfaces/i-room';
 import { IItem } from '../interfaces/i-item';
+import { ISafe } from '../interfaces/i-safe';
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
 
   //url to sheet 2 of room info in data
+  //rooms
   sheet2URL = 'https://spreadsheets.google.com/feeds/list/1v5NuhtYRLfdSITmYV4wEHEZybMof2avup0-crqud5uQ/2/public/full?alt=json';
 
+  //items
   sheet1URL = 'https://spreadsheets.google.com/feeds/list/1v5NuhtYRLfdSITmYV4wEHEZybMof2avup0-crqud5uQ/1/public/full?alt=json';
+
+  //safe
+  sheet3URL = 'https://spreadsheets.google.com/feeds/list/1v5NuhtYRLfdSITmYV4wEHEZybMof2avup0-crqud5uQ/3/public/full?alt=json';
 
   googlesheet2; //used in parseDataForBackground
   roomSheet;  // used in parseRoomData
   itemSheet;  // used in parseItemData
+  safeSheet;  // used in parseSafeData
 
   rooms: IRoomBackground[] = [];
   roomData: IRoom[] = [];
   itemData: IItem[] = [];
+  safeData: ISafe[] = [];
 
   constructor(private http: HttpClient) {
     //this.parseDataForBackground();  //run to see at start
     this.parseRoomData(); // run to see at start
     this.parseItemData(); // run to see at start
+    this.parseSafeData();
   }
 
   getData() {
@@ -108,6 +117,27 @@ export class DataService {
     ); // end of subscribe
   }
 
+  parseSafeData() {
+    //dump sheet data
+    this.safeSheet = this.http.get(this.sheet3URL);
+
+    //parse item data using item interface
+    this.safeSheet.subscribe(
+      x => {
+        for (let s of x.feed.entry) {
+          let info: ISafe = {
+            safeName: s.gsx$safename.$t,
+            safeCombination: s.gsx$safecombination.$t as number
+          }; // end of obj
+          //push into array
+          this.safeData.push(info);
+        } // end of for
+        // log item data
+        console.log(this.safeData);
+      } // end of arrow
+    ); // end of subscribe
+  }
+
   getRooms() {
     return this.rooms;
   }
@@ -120,5 +150,9 @@ export class DataService {
 
   getItems() {
     return this.itemData;
+  }
+
+  getSafeData() {
+    return this.safeData;
   }
 }

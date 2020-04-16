@@ -8,7 +8,7 @@
           <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
             <div *ngFor="let room of roomsInDropdown">
               <button *ngIf="room.roomIsHidden === 'FALSE'" ngbDropdownItem
-                (click)="changeBackground(room.roomURL)">{{ room.roomName }}</button>
+                (click)="changeBackground(room.roomURL, room.roomName)">{{ room.roomName }}</button>
             </div>
           </div>
         </div>
@@ -18,12 +18,60 @@
     <div class="row">
       <div class="col">
         <div *ngIf="(showItems)">
-          <div *ngFor="let item of itemsInRooms">
-            <button *ngIf="item.itemLocation === room.roomName" class="btn btn-danger"></button>
+          <div class="itemStyle" *ngFor="let item of itemsInRooms">
+            <button *ngIf="item.itemLocation === theRoomName" (click)="addToTextArea
+            (item.itemDesc, 
+            item.itemHasDecision, 
+            item.itemDecision, 
+            item.itemChoice1, 
+            item.itemChoice2, 
+            item.itemResult,
+            item.itemName)" class="btn btn-danger">
+              {{ item.itemName }}
+            </button>
           </div>
         </div>
       </div>
     </div>
+
+    <div class="row">
+      <div class="col">
+        <textarea name="" id="txtArea" cols="30" rows="5" readonly></textarea>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+
+        <div>
+          <h1 id="decisionHeader" class="vis">Decisions</h1>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+
+        <div>
+          <button id="choice1" class="vis btn btn-primary">Default</button>
+          <button id="choice2" class="vis btn btn-secondary">Default</button>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+
+        <div>
+          <input id="safeInput" class="vis" type="text">
+        </div>
+
+      </div>
+    </div>
+
+
 
   </div>
 </div>
