@@ -4,6 +4,7 @@ import { IRoomBackground } from '../interfaces/i-room-background';
 import { IRoom } from '../interfaces/i-room';
 import { IItem } from '../interfaces/i-item';
 import { ISafe } from '../interfaces/i-safe';
+import { INventory } from '../interfaces/i-nventory';
 @Injectable({
   providedIn: 'root'
 })
@@ -12,28 +13,31 @@ export class DataService {
   //url to sheet 2 of room info in data
   //rooms
   sheet2URL = 'https://spreadsheets.google.com/feeds/list/1v5NuhtYRLfdSITmYV4wEHEZybMof2avup0-crqud5uQ/2/public/full?alt=json';
-
   //items
   sheet1URL = 'https://spreadsheets.google.com/feeds/list/1v5NuhtYRLfdSITmYV4wEHEZybMof2avup0-crqud5uQ/1/public/full?alt=json';
-
   //safe
   sheet3URL = 'https://spreadsheets.google.com/feeds/list/1v5NuhtYRLfdSITmYV4wEHEZybMof2avup0-crqud5uQ/3/public/full?alt=json';
+  //inventory
+  sheet4URL = 'https://spreadsheets.google.com/feeds/list/1v5NuhtYRLfdSITmYV4wEHEZybMof2avup0-crqud5uQ/4/public/full?alt=json';
 
   googlesheet2; //used in parseDataForBackground
   roomSheet;  // used in parseRoomData
   itemSheet;  // used in parseItemData
   safeSheet;  // used in parseSafeData
+  inventorySheet; //used in parseInventoryData
 
   rooms: IRoomBackground[] = [];
   roomData: IRoom[] = [];
   itemData: IItem[] = [];
   safeData: ISafe[] = [];
+  inventoryData: INventory[] = [];
 
   constructor(private http: HttpClient) {
     //this.parseDataForBackground();  //run to see at start
     this.parseRoomData(); // run to see at start
     this.parseItemData(); // run to see at start
     this.parseSafeData();
+    this.parseInventoryData();
   }
 
   getData() {
@@ -138,6 +142,28 @@ export class DataService {
     ); // end of subscribe
   }
 
+  parseInventoryData() {
+    //dump sheet data
+    this.inventorySheet = this.http.get(this.sheet4URL);
+
+    //parse item data using item interface
+    this.inventorySheet.subscribe(
+      x => {
+        for (let i of x.feed.entry) {
+          let info: INventory = {
+            inventoryName: i.gsx$inventoryname.$t,
+            inventoryText: i.gsx$inventorytext.$t,
+            inventoryThere: i.gsx$inventorythere.$t as boolean
+          }; // end of obj
+          //push into array
+          this.inventoryData.push(info);
+        } // end of for
+        // log item data
+        console.log(this.inventoryData);
+      } // end of arrow
+    ); // end of subscribe
+  }
+
   getRooms() {
     return this.rooms;
   }
@@ -154,5 +180,9 @@ export class DataService {
 
   getSafeData() {
     return this.safeData;
+  }
+
+  getInventoryData() {
+    return this.inventoryData;
   }
 }

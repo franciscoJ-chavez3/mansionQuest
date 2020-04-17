@@ -71,6 +71,18 @@
       </div>
     </div>
 
+    <div class="row">
+      <div class="col">
+
+        <div *ngFor="let invent of inventoryInfo">
+          <button class="btn btn-danger" *ngIf="invent.inventoryThere === 'TRUE'">
+            {{ invent.inventoryName }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+
 
 
   </div>

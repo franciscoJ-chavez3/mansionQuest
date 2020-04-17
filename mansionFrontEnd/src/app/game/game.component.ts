@@ -3,6 +3,7 @@ import { DataService } from '../services/data.service';
 import { IRoom } from '../interfaces/i-room';
 import { IItem } from '../interfaces/i-item';
 import { ISafe } from '../interfaces/i-safe';
+import { INventory } from '../interfaces/i-nventory';
 
 @Component({
   selector: 'app-game',
@@ -14,12 +15,12 @@ export class GameComponent implements OnInit {
   //declare varible to hold roominfo
   //change from IRoomBackground to IRoom
   roomsInDropdown: IRoom[];
-
   //declare array to hold item data
   itemsInRooms: IItem[];
-
   //for safes
   safeInfo: ISafe[];
+  //for inventory
+  inventoryInfo: INventory[];
 
   //create boolean to control items shown upon click
   showItems = false;
@@ -43,6 +44,7 @@ export class GameComponent implements OnInit {
     this.roomsInDropdown = this.ds.getVisibleRooms();
     this.itemsInRooms = this.ds.getItems();
     this.safeInfo = this.ds.getSafeData();
+    this.inventoryInfo = this.ds.getInventoryData();
   }
 
   changeBackground(backgroundURL: string, roomName: string) {
