@@ -35,6 +35,7 @@ export class SignInComponent implements OnInit {
 
   //create login function
   login(uName: string, pWord: string) {
+    
     //check username/password are empty
     //check length of password
     //store into object
@@ -49,7 +50,9 @@ export class SignInComponent implements OnInit {
     this.dService.login(this.userLogin);
 
     //route to home page after successful login - moved to service
+    //create condition to implement navigate upon a successful login
     this.router.navigate(['home']);
+    
   }
 
 }

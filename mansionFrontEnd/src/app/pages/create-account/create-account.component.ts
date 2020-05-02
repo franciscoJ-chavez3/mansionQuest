@@ -18,6 +18,7 @@ export class CreateAccountComponent implements OnInit {
   {
     // pass params into user object
     let user: IUser = {
+      userID: 0,
       username: uName,
       password: pWord
     }
