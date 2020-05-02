@@ -3,7 +3,9 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  // jwt #2 lecture => /roominfo => /nothing
+  api: 'http://localhost:5000/'
 };
 
 /*

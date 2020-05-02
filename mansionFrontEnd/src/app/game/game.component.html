@@ -6,9 +6,11 @@
         <div ngbDropdown class="d-inline-block">
           <button class="btn btn-primary" id="dropdownBasic1" ngbDropdownToggle>Rooms</button>
           <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-            <div *ngFor="let room of roomsInDropdown">
-              <button *ngIf="room.roomIsHidden === 'FALSE'" ngbDropdownItem
-                (click)="changeBackground(room.roomURL, room.roomName)">{{ room.roomName }}</button>
+            <div *ngFor="let room of rInDropdown">
+              <button *ngIf="room.roomIsHidden === false" ngbDropdownItem
+                (click)="changeBackground(room.roomURL, room.roomName)">
+                {{ room.roomName }}
+              </button>
             </div>
           </div>
         </div>
@@ -54,7 +56,7 @@
       <div class="col">
 
         <div>
-          <button id="choice1" class="vis btn btn-primary">Default</button>
+          <button (click)="addToInventory()" id="choice1" class="vis btn btn-primary">Default</button>
           <button id="choice2" class="vis btn btn-secondary">Default</button>
         </div>
 
@@ -75,7 +77,7 @@
       <div class="col">
 
         <div *ngFor="let invent of inventoryInfo">
-          <button class="btn btn-danger" *ngIf="invent.inventoryThere === 'TRUE'">
+          <button class="btn btn-danger" *ngIf="invent.inventoryThere === true">
             {{ invent.inventoryName }}
           </button>
         </div>

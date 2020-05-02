@@ -14,7 +14,7 @@ export class GameComponent implements OnInit {
 
   //declare varible to hold roominfo
   //change from IRoomBackground to IRoom
-  roomsInDropdown: IRoom[];
+  //roomsInDropdown: IRoom[];
   //declare array to hold item data
   itemsInRooms: IItem[];
   //for safes
@@ -22,14 +22,20 @@ export class GameComponent implements OnInit {
   //for inventory
   inventoryInfo: INventory[];
 
+  rInDropdown;
+
   //create boolean to control items shown upon click
   showItems = false;
 
   //set to this for items
   theRoomName: string;
+  // set to this for reference in choice1 click addtoinventory
+  nameOfItemClicked: string;
 
   //set to this for decisions
   isVisible = false;
+
+
 
 
 
@@ -38,13 +44,38 @@ export class GameComponent implements OnInit {
   }
 
   ngOnInit() {
+    // set rInDropdown - won't work if you refresh page?
+    this.rInDropdown = this.ds.GetTheRoomData();
+    
     //used for original run
     //this.roomsInDropdown = this.ds.getRooms();
     //call function that return rooms that are NOT hidden
-    this.roomsInDropdown = this.ds.getVisibleRooms();
+
+    //grabed rooms from backend, replaced by rInDropdown
+    //this.roomsInDropdown = this.ds.getVisibleRooms();
+
     this.itemsInRooms = this.ds.getItems();
+
     this.safeInfo = this.ds.getSafeData();
+
     this.inventoryInfo = this.ds.getInventoryData();
+
+    // from api intro part 2 lecture
+    //this.ds.getRoomsFromApi().subscribe(x => console.log(x));
+
+    // from api intro part 3.1 lecture
+    /*
+    this.ds.addTrack({
+      "roomID": 2,
+      "roomName": "Study",
+      "roomIsHidden": false,
+      "roomIsLocked": true,
+      "roomIsDark": false,
+      "roomURL": "url(../../assets/images/studyBackground.jpg)",
+      "roomLockedText": "This room is locked. You need the key to enter",
+      "roomDarkText": "This room is not dark"
+    }).subscribe(x => console.log(x));
+    */
   }
 
   changeBackground(backgroundURL: string, roomName: string) {
@@ -62,6 +93,8 @@ export class GameComponent implements OnInit {
 
   //add decision, choices, and result as parameters
   addToTextArea(desc: string, hasDecision: string, decision: string, choice1: string, choice2: string, result: string, name: string) {
+    //set nameOfItemClicked
+    this.nameOfItemClicked = name;
     //target textarea
     let txtArea = document.getElementById('txtArea');
     //add to innerHTML not innerText
@@ -111,6 +144,17 @@ export class GameComponent implements OnInit {
     decisionHeader.style.visibility = 'hidden';
     btn1.style.visibility = 'hidden';
     btn2.style.visibility = 'hidden';
+  }
+
+  addToInventory() {
+    //cycle thru safeInfo
+    for (let i = 0; i < this.inventoryInfo.length; i++) {
+      // check if item clicked exists in inventory
+      if (this.inventoryInfo[i].inventoryName === this.nameOfItemClicked) {
+        // make inventory item visible
+        this.inventoryInfo[i].inventoryThere = true;
+      }
+    }
   }
 
 }

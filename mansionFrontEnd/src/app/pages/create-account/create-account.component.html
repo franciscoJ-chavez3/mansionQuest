@@ -1,0 +1,41 @@
+<div class="container border border-dark">
+
+  <div class="row border border-primary">
+
+    <div class="col border border-danger">
+
+      <div class="view d-flex flex-column justify-content-center">
+        
+        <div class="d-flex justify-content-center">
+
+          <h5 class="text-center">Create Your User Account</h5>
+
+          <div class="form-group d-flex flex-column">
+              <label>
+                Username:
+              </label>
+
+              <input #username class="mb-2 form-control" type="text">
+                
+              <label>
+                Password:
+              </label>
+
+              <input #password class="mb-1 form-control" type="text">
+            </div>
+
+        </div>
+
+        <div class="d-flex justify-content-center">
+          <button type="submit" class="btn btn-primary" (click)="create(username.value, password.value)">
+                Sign In
+          </button>
+        </div>
+
+      </div>
+      
+    </div>
+
+  </div>
+
+</div>
