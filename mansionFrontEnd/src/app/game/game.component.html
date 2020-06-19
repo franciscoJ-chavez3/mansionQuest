@@ -2,13 +2,14 @@
   <div class="gameHeight container">
 
     <div class="row">
-      <div class="col">
-        <div ngbDropdown class="d-inline-block">
+      <div class="col d-flex mt-5">
+        <!-- <button class="btn btn-primary mx-2" (click)="loadItems()">Items</button> -->
+        <div ngbDropdown class="d-flex align-self-center">
           <button class="btn btn-primary" id="dropdownBasic1" ngbDropdownToggle>Rooms</button>
           <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-            <div *ngFor="let room of rInDropdown">
+            <div *ngFor="let room of rInDropdown; let i = index">
               <button *ngIf="room.roomIsHidden === false" ngbDropdownItem
-                (click)="changeBackground(room.roomURL, room.roomName)">
+                (click)="changeBackground(room.roomURL, room.roomName, room.roomIsLocked, i)">
                 {{ room.roomName }}
               </button>
             </div>
@@ -17,75 +18,65 @@
       </div>
     </div>
 
-    <div class="row">
+    <div class="row mt-5">
       <div class="col">
         <div *ngIf="(showItems)">
-          <div class="itemStyle" *ngFor="let item of itemsInRooms">
-            <button *ngIf="item.itemLocation === theRoomName" (click)="addToTextArea
-            (item.itemDesc, 
-            item.itemHasDecision, 
-            item.itemDecision, 
-            item.itemChoice1, 
-            item.itemChoice2, 
-            item.itemResult,
-            item.itemName)" class="btn btn-danger">
-              {{ item.itemName }}
-            </button>
+          <div class="d-flex flex-wrap">
+            <h4 class="d-flex align-self-center bg-dark text-white rounded mr-5 p-2">Items in {{theRoomName}}: </h4>
+            <div *ngFor="let item of itemsInRooms; let i = index">
+              <button *ngIf="item.itemLocation === theRoomName && item.itemHidden === false" 
+                (click)="addToTextArea
+                (item.itemDesc, item.itemHasDecision, 
+                item.itemDecision, item.itemChoice1, 
+                item.itemChoice2, item.itemResult,
+                item.itemName, i)" class="btn btn-danger mx-3 my-1">
+                  {{ item.itemName }}
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="row">
-      <div class="col">
-        <textarea name="" id="txtArea" cols="30" rows="5" readonly></textarea>
+    <div class="row mt-5">
+      <div class="col-4">
+          <textarea id="txtArea" rows="9" style="height: 100%; width: 150%" readonly>Start in the Parlor!</textarea>
       </div>
+      <div class="col"></div>
     </div>
 
     <div class="row">
       <div class="col">
-
-        <div>
-          <h1 id="decisionHeader" class="vis">Decisions</h1>
-        </div>
-
+        <h1 id="decisionHeader" class="vis d-inline-block rounded bg-dark text-white mt-3 p-2">Decisions</h1>
       </div>
     </div>
 
     <div class="row">
-      <div class="col">
-
-        <div>
+      <div class="col d-flex justify-content-around">
           <button (click)="addToInventory()" id="choice1" class="vis btn btn-primary">Default</button>
-          <button id="choice2" class="vis btn btn-secondary">Default</button>
-        </div>
-
+          <button (click)="hideDecision()" id="choice2" class="vis btn btn-danger">Default</button>
       </div>
+      <div class="col-9"></div>
     </div>
 
     <div class="row">
       <div class="col">
-
-        <div>
           <input id="safeInput" class="vis" type="text">
-        </div>
-
       </div>
     </div>
 
     <div class="row">
       <div class="col">
-
-        <div *ngFor="let invent of inventoryInfo">
-          <button class="btn btn-danger" *ngIf="invent.inventoryThere === true">
-            {{ invent.inventoryName }}
-          </button>
+        <div class="bStyle d-flex flex-wrap rounded">
+            <h4 class="d-flex align-self-center rounded bg-dark text-white mx-5 p-2">Inventory: </h4>
+            <div class="d-flex align-self-center" *ngFor="let item of inventoryInfo">
+              <button class="btn btn-danger noClick mx-3" *ngIf="item.inventoryThere === true">
+                {{ item.inventoryName }}
+              </button>
+            </div>
         </div>
-
       </div>
     </div>
-
-
 
   </div>
 </div>

@@ -13,6 +13,12 @@ import { SignInComponent } from './pages/sign-in/sign-in.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CreateAccountComponent } from './pages/create-account/create-account.component';
 import { StartPageComponent } from './pages/start-page/start-page.component';
+import { InstructionsComponent } from './pages/instructions/instructions.component';
+import { JwtModule } from '@auth0/angular-jwt';
+
+export function tokenGetter() {
+  return localStorage.getItem("jwt");
+}
 
 @NgModule({
   declarations: [
@@ -22,14 +28,22 @@ import { StartPageComponent } from './pages/start-page/start-page.component';
     GameComponent,
     SignInComponent,
     CreateAccountComponent,
-    StartPageComponent
+    StartPageComponent,
+    InstructionsComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     NgbModule,
     HttpClientModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    JwtModule.forRoot({
+      config: {
+        tokenGetter,
+        whitelistedDomains: ['localhost:5000'],
+        blacklistedRoutes: [],
+      },
+    })
   ],
   providers: [],
   bootstrap: [AppComponent]

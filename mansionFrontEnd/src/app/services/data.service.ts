@@ -16,7 +16,6 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class DataService {
-
   //url to sheet 2 of room info in data
   //rooms
   sheet2URL = 'https://spreadsheets.google.com/feeds/list/1v5NuhtYRLfdSITmYV4wEHEZybMof2avup0-crqud5uQ/2/public/full?alt=json';
@@ -27,47 +26,37 @@ export class DataService {
   //inventory
   sheet4URL = 'https://spreadsheets.google.com/feeds/list/1v5NuhtYRLfdSITmYV4wEHEZybMof2avup0-crqud5uQ/4/public/full?alt=json';
 
-  //following along with lecture api lecture part 2
-  //apiURL: string = 'localhost:5000/roominfo';
-
   // replace apiURL by referencing environment
   public apiURL:string = environment.api;
-
   // created in jwt lecture #2: for login 
   private loginURL:string = this.apiURL + 'api/auth/login';
-  private token;
+  private createUrl:string = this.apiURL + 'login';
+  private token:any;
   httpOptions = {
     headers: new HttpHeaders({
       'Content-Type' : 'application/json',
       'Authorization' : 'my-auth-token'
     })
   };
-
-  googlesheet2; //used in parseDataForBackground
-  roomSheet;  // used in parseRoomData
-  itemSheet;  // used in parseItemData
-  safeSheet;  // used in parseSafeData
-  inventorySheet; //used in parseInventoryData
-  private router: Router;
-
+  googlesheet2:any; //used in parseDataForBackground
+  roomSheet:any;  // used in parseRoomData
+  itemSheet:any;  // used in parseItemData
+  safeSheet:any;  // used in parseSafeData
+  inventorySheet:any; //used in parseInventoryData
   rooms: IRoomBackground[] = [];
   roomData: IRoom[] = [];
   itemData: IItem[] = [];
   safeData: ISafe[] = [];
   inventoryData: INventory[] = [];
-
   //testing my backend
   apiRoomData: IRoom[] = [];
   //will store the roomdata from api, rather than googlesheets
-  theRoomData;
+  theRoomData:any;
 
-  constructor(private http: HttpClient) {
-    //this.parseDataForBackground();  //run to see at start
-    //this.parseRoomData(); // run to see at start
-    this.parseItemData(); // run to see at start
+  constructor(private http: HttpClient, private router:Router) {
+    this.parseItemData();
     this.parseSafeData();
     this.parseInventoryData();
-    this.GetRoomsFromBackEnd();
   }
 
   // api lecture #2 - added 'roominfo' after jwt lecture
@@ -75,35 +64,22 @@ export class DataService {
     return this.http.get(this.apiURL+'roominfo');
   }
 
-  // from api lecture Part 3 - added 'roominfo' after jwt lecture
-  /*
-  addTrack(request: any) {
-    return this.http.post(this.apiURL+'roominfo', request);
-  }
-  */
-
   // from jwt lecture 2: login function
-  login(credentials: IUser)
-  {
-    // Post Request
-    // http.post( URL to post to, information to be passed )
-
-    // set token to result of http post
-    // this 'way' returns an Observable
-    /*
-    this.token = this.http.post(this.loginURL, credentials)
-    console.log(this.token);
-    */
-
-    // second 'way' in jwt lecture #2
+  login(credentials: any){
     this.http.post(this.loginURL, credentials).subscribe(data => {
       //set token
       this.token = data;
+      this.token = this.token.token;
+      //save to local storage
+      localStorage.setItem('jwt', JSON.stringify(this.token));
       console.log(this.token);
-      //store token into localStorage
+      //navigate to home
+      this.router.navigate(['home']);
     });
+  }
 
-    //this.router.navigate(['home']);
+  createNewUser(user:IUser){
+     return this.http.post(this.createUrl, user);
   }
   // from jwt lecture
   GetWeather() {
@@ -114,38 +90,16 @@ export class DataService {
   }
 
   // testing my backend
-  GetRoomsFromBackEnd()
-  {
-    // console log data
-    this.http.get(this.apiURL+'room').subscribe(
-      data => {
-        // store rooms in global variable
-        this.theRoomData = data;
-        //console log
-        console.log(this.theRoomData);
-      }
-    );
-    
-      /*
-    //this.apiRoomData = this.http.get(this.apiURL+'room');
-    console.log(this.apiRoomData);
-
-    this.http.get(this.apiURL+'room').pipe(
-      map((data: IRoom[]) => {
-        this.apiRoomData = data;
-        console.log(this.apiRoomData);
-      }));
-      */
+  GetRoomsFromBackEnd(){
+    return this.http.get(this.apiURL+'room');
   }
   // return room data from back to front
-  GetTheRoomData()
-  {
+  GetTheRoomData(){
     return this.theRoomData;
   }
 
   // post user object to backend
-  PostNewUser(newUser: IUser)
-  {
+  PostNewUser(newUser: IUser){
     this.http.post(this.apiURL, newUser);
   }
 
@@ -174,34 +128,6 @@ export class DataService {
       } //end of arrow
     );  //end of subscribe
   }
-  /*
-  parseRoomData() {
-    //  dump sheet data onto roomsheet
-    this.roomSheet = this.http.get(this.sheet2URL);
-
-    //  parse sheet data 
-    this.roomSheet.subscribe(
-      x => {
-        for (let r of x.feed.entry) {
-          let info: IRoom = {
-            roomID: r.gsx$id.$t as number,
-            roomName: r.gsx$roomname.$t,
-            roomIsHidden: r.gsx$roomhidden.$t as boolean,
-            roomIsLocked: r.gsx$roomlocked.$t as boolean,
-            roomIsDark: r.gsx$roomdark.$t as boolean,
-            roomURL: r.gsx$roombackground.$t,
-            roomLockedText: r.gsx$roomlockedtext.$t,
-            roomDarkText: r.gsx$roomdarktext.$t
-          }; //end of obj
-          //push into array
-          this.roomData.push(info);
-        } //end of for
-        //log rooms
-        console.log(this.roomData);
-      } //end of arrow
-    );  //end of subscribe
-  }
-  */
 
   parseItemData() {
     //dump sheet data
@@ -227,9 +153,20 @@ export class DataService {
           this.itemData.push(info);
         } // end of for
         // log item data
+        this.loadItems();
         console.log(this.itemData);
       } // end of arrow
     ); // end of subscribe
+  }
+
+  loadItems(){
+    for(let index = 0; index < this.itemData.length; index++){
+      this.itemData[index].itemHidden = false;
+      if(this.itemData[index].itemName === 'note behind brick' || this.itemData[index].itemName === 'smoke pipe behind brick' || this.itemData[index].itemName === 'music sheet piece #1'){
+        this.itemData[index].itemHidden = true;
+      }
+    }
+    console.log(this.itemData);
   }
 
   parseSafeData() {
@@ -264,7 +201,8 @@ export class DataService {
           let info: INventory = {
             inventoryName: i.gsx$inventoryname.$t,
             inventoryText: i.gsx$inventorytext.$t,
-            inventoryThere: i.gsx$inventorythere.$t as boolean
+            inventoryThere: i.gsx$inventorythere.$t as boolean,
+            room: i.gsx$room.$t
           }; // end of obj
           //push into array
           this.inventoryData.push(info);
@@ -279,8 +217,6 @@ export class DataService {
     return this.rooms;
   }
 
-  //use .filter to meet condition of whether room is visible
-  //nvm, used ngIf to test if room is hidden
   getVisibleRooms() {
     return this.roomData;
   }

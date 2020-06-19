@@ -1,9 +1,6 @@
 .gameHeight{
   height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
+  
 }
 
 .theBackground{
@@ -26,4 +23,14 @@
 
 .vis{
   visibility: hidden;
+}
+
+.bStyle{
+  height: 25vh;
+  border-style: double;
+  border-width: thick;
+}
+
+.noClick{
+  pointer-events: none;
 }

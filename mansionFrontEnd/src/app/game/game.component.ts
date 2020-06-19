@@ -11,94 +11,89 @@ import { INventory } from '../interfaces/i-nventory';
   styleUrls: ['./game.component.scss']
 })
 export class GameComponent implements OnInit {
-
-  //declare varible to hold roominfo
-  //change from IRoomBackground to IRoom
-  //roomsInDropdown: IRoom[];
   //declare array to hold item data
   itemsInRooms: IItem[];
   //for safes
   safeInfo: ISafe[];
   //for inventory
   inventoryInfo: INventory[];
-
-  rInDropdown;
-
+  rInDropdown:any;
   //create boolean to control items shown upon click
   showItems = false;
-
   //set to this for items
   theRoomName: string;
   // set to this for reference in choice1 click addtoinventory
   nameOfItemClicked: string;
-
   //set to this for decisions
   isVisible = false;
-
-
-
+  //store result of clicked item
+  currentResult:string;
+  //store index of clicked item/room
+  idxOfItm:number;
+  idxOfRoom:number;
 
 
   constructor(private ds: DataService) {
-    //ds.getData().subscribe(x => console.log(x));
   }
 
   ngOnInit() {
-    // set rInDropdown - won't work if you refresh page?
-    this.rInDropdown = this.ds.GetTheRoomData();
-    
-    //used for original run
-    //this.roomsInDropdown = this.ds.getRooms();
-    //call function that return rooms that are NOT hidden
+
+    // set rInDropdown
+    this.ds.GetRoomsFromBackEnd().subscribe(x => {
+      this.rInDropdown = x;
+    console.log(this.rInDropdown);
+    });
 
     //grabed rooms from backend, replaced by rInDropdown
-    //this.roomsInDropdown = this.ds.getVisibleRooms();
-
-    this.itemsInRooms = this.ds.getItems();
-
     this.safeInfo = this.ds.getSafeData();
-
     this.inventoryInfo = this.ds.getInventoryData();
-
-    // from api intro part 2 lecture
-    //this.ds.getRoomsFromApi().subscribe(x => console.log(x));
-
-    // from api intro part 3.1 lecture
-    /*
-    this.ds.addTrack({
-      "roomID": 2,
-      "roomName": "Study",
-      "roomIsHidden": false,
-      "roomIsLocked": true,
-      "roomIsDark": false,
-      "roomURL": "url(../../assets/images/studyBackground.jpg)",
-      "roomLockedText": "This room is locked. You need the key to enter",
-      "roomDarkText": "This room is not dark"
-    }).subscribe(x => console.log(x));
-    */
+    this.itemsInRooms = this.ds.getItems();
   }
 
-  changeBackground(backgroundURL: string, roomName: string) {
-    //change showItems
-    this.showItems = true;
-    //set theRoomName
-    this.theRoomName = roomName;
-    //say hello
-    console.log('Hi! This is the changeBackground() function');
-    //target element and change url of image
-    document.getElementById("bground").style.backgroundImage = backgroundURL;
-    //hide decision
-    this.hideDecision();
+  changeBackground(backgroundURL: string, roomName: string, roomIsLocked: boolean, roomIndex:number) {
+    //test if room is locked
+    //console.log(this.rInDropdown[roomIndex]);
+    if(roomIsLocked === true){
+      this.theRoomName = roomName;
+      this.idxOfRoom = roomIndex;
+      document.getElementById('txtArea').innerHTML += ('This room is locked' + '&#13;&#10;');
+      //prevent items from showing
+      this.showItems = false;
+      //check user inventory for locked doors
+      for(let i = 0; i < this.inventoryInfo.length; i++){
+        if(this.inventoryInfo[i].room === this.theRoomName && this.inventoryInfo[i].inventoryThere === true){
+          document.getElementById('txtArea').innerHTML += 'Oh wait, you have a key!' + '&#13;&#10;';
+          this.rInDropdown[roomIndex].roomIsLocked = false;
+          //console.log(this.rInDropdown[roomIndex]);
+          document.getElementById('txtArea').innerHTML += '     Click on ' + this.theRoomName + ' again.' + '&#13;&#10;';
+        }
+      }
+    } else {
+      //change showItems
+      this.showItems = true;
+      //set theRoomName
+      this.theRoomName = roomName;
+      //target element and change url of image
+      document.getElementById("bground").style.backgroundImage = backgroundURL;
+      //hide decision
+      this.hideDecision();
+    }
+    
   }
 
   //add decision, choices, and result as parameters
-  addToTextArea(desc: string, hasDecision: string, decision: string, choice1: string, choice2: string, result: string, name: string) {
+  addToTextArea(desc: string, hasDecision: string, decision: string, choice1: string, choice2: string, result: string, name: string, i: number) {
     //set nameOfItemClicked
     this.nameOfItemClicked = name;
+    //set currentResult
+    this.currentResult = result;
+    //set idxOfItem
+    this.idxOfItm = i;
     //target textarea
     let txtArea = document.getElementById('txtArea');
     //add to innerHTML not innerText
-    txtArea.innerHTML += desc;
+    txtArea.innerHTML += ('&#13;&#10;' + desc + '&#13;&#10;');
+    txtArea.scrollTop = txtArea.scrollHeight;
 
     //target decisionheader & btns
     let decisionHeader = document.getElementById('decisionHeader');
@@ -147,12 +142,52 @@ export class GameComponent implements OnInit {
   }
 
   addToInventory() {
+    //refactor code later to proper seperate function that handles events
+    if(this.nameOfItemClicked === 'Bust of Sherlock Holmes'){
+      //check inventory
+      for(let x = 0; x < this.inventoryInfo.length; x++){
+        if(this.inventoryInfo[x].inventoryName === 'hat' || this.inventoryInfo[x].inventoryName === 'smoke pipe behind brick'){
+          if(this.inventoryInfo[x].inventoryThere === true){
+            //remove from inventory
+            this.inventoryInfo[x].inventoryThere = false;
+            //reveal music sheet
+            for(let y = 0; y < this.itemsInRooms.length; y++){
+              if(this.itemsInRooms[y].itemName === 'music sheet piece #1'){
+                //set hidden to false
+                this.itemsInRooms[y].itemHidden = false;
+              }
+            }
+          }
+        }
+      }
+    }
+    //set to hidden
+    this.hideDecision();
+    //display to textArea
+    document.getElementById('txtArea').innerHTML += (this.currentResult + '&#13;&#10;');
+    document.getElementById('txtArea').scrollTop = document.getElementById('txtArea').scrollHeight;
+
+    //check for brick - refactor in different function like statue fix
+    if(this.nameOfItemClicked === 'loose brick'){
+      //set items hidden to true
+      for(let idx = 0; idx < this.itemsInRooms.length; idx++){
+        //set loose brick to hidden
+        if(this.itemsInRooms[idx].itemName === 'loose brick'){
+          this.itemsInRooms[idx].itemHidden = true;
+        }
+        if(this.itemsInRooms[idx].itemName === 'smoke pipe behind brick' || this.itemsInRooms[idx].itemName === 'note behind brick'){
+          this.itemsInRooms[idx].itemHidden = false;
+        }
+      }
+    }
+
     //cycle thru safeInfo
     for (let i = 0; i < this.inventoryInfo.length; i++) {
       // check if item clicked exists in inventory
       if (this.inventoryInfo[i].inventoryName === this.nameOfItemClicked) {
         // make inventory item visible
         this.inventoryInfo[i].inventoryThere = true;
+        this.itemsInRooms[this.idxOfItm].itemHidden = true;
       }
     }
   }
