@@ -83,7 +83,8 @@ export class DataService {
   }
   // from jwt lecture
   GetWeather() {
-    this.httpOptions.headers = this.httpOptions.headers.set('Authorization', 'bearer ' + this.token);
+    const tokenInfo = 'bearer ' + JSON.parse(localStorage.getItem('jwt'));
+    this.httpOptions.headers = this.httpOptions.headers.set('Authorization', tokenInfo); 
     this.http.get(this.apiURL+'weatherforecast', this.httpOptions).subscribe(data => {
       console.log(data);
     });
@@ -98,7 +99,7 @@ export class DataService {
     return this.theRoomData;
   }
 
-  // post user object to backend
+  // post user object to backend / replaced by create new user
   PostNewUser(newUser: IUser){
     this.http.post(this.apiURL, newUser);
   }
@@ -154,7 +155,6 @@ export class DataService {
         } // end of for
         // log item data
         this.loadItems();
-        console.log(this.itemData);
       } // end of arrow
     ); // end of subscribe
   }

@@ -37,7 +37,6 @@ export class GameComponent implements OnInit {
   }
 
   ngOnInit() {
-
     // set rInDropdown
     this.ds.GetRoomsFromBackEnd().subscribe(x => {
       this.rInDropdown = x;
@@ -143,6 +142,7 @@ export class GameComponent implements OnInit {
 
   addToInventory() {
     //refactor code later to proper seperate function that handles events
+    //handle for both conditions being 'there' not just 1 or the other
     if(this.nameOfItemClicked === 'Bust of Sherlock Holmes'){
       //check inventory
       for(let x = 0; x < this.inventoryInfo.length; x++){
